@@ -40,7 +40,6 @@ public class User implements Serializable{
     @JsonIgnore
     private Set<Product> favoriteProducts = new HashSet<>();
 
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch=FetchType.EAGER)
     private List<Review> reviews = new ArrayList<>();
 
