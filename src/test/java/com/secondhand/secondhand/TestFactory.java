@@ -1,6 +1,7 @@
 package com.secondhand.secondhand;
 
 import com.secondhand.secondhand.model.Address;
+import com.secondhand.secondhand.model.Genre;
 import com.secondhand.secondhand.model.Product;
 import com.secondhand.secondhand.model.User;
 
@@ -46,5 +47,11 @@ public class TestFactory {
         address.setState(state);
         address.setZipcode(zipcode);
         return address;
+    }
+
+    public static Genre getGenre(String genreType) {
+        Genre genre = new Genre();
+        genre.setGenreType(genreType);
+        return genre;
     }
 }
