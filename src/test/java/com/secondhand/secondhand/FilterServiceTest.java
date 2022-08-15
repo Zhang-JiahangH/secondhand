@@ -116,7 +116,7 @@ public class FilterServiceTest {
         assertNotNull("retirved product list shouldn't be null", condition1);
 
         logger.info("Running findProductByAddress test for FilterService. Only has city name");
-        List<Product> condition2 = filterService.findProductByFilter(null, "LA", null, null);
+        List<Product> condition2 = filterService.findProductByFilter(null, "trail_cityname", null, null);
         assertNotNull("retirved product list shouldn't be null", condition2);
     }
 
