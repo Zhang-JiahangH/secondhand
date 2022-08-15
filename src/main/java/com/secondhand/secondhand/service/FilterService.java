@@ -38,11 +38,6 @@ public class FilterService {
     }
 
     private List<Product> findProductByAddress(Integer zipcode, String city) throws ZipcodeNotExistException, CityNotExistException{
-        // No Limit
-        if (zipcode == null && city.equals("")) {
-            return productRepository.findAll();
-        }
-
         // With Limit
         if (zipcode != null && !addressRepository.existsByZipcode(zipcode)) {
             throw new ZipcodeNotExistException("No result found. Invalid Zipcode.");

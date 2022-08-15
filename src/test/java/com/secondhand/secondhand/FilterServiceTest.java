@@ -56,6 +56,16 @@ public class FilterServiceTest {
         List<Product> retrivedProducts = filterService.findProductByFilter(10010, "trail_cityname", 0, 2);
         assertNotNull("retirved product list shouldn't be null", retrivedProducts);
         assertEquals(retrivedProducts.get(0).getProductName(), product.getProductName());
+
+        logger.info("Running findProductByFilter test for FilterService. Verifying different conditions.");
+        List<Product> retrivedProductsCondition1 = filterService.findProductByFilter(10010, "", 0, 1);
+        assertNotNull("retirved product list shouldn't be null", retrivedProductsCondition1);
+        List<Product> retrivedProductsCondition2 = filterService.findProductByFilter(null, "trail_cityname", 0, 1);
+        assertNotNull("retirved product list shouldn't be null", retrivedProductsCondition2);
+        List<Product> retrivedProductsCondition3 = filterService.findProductByFilter(10010, "trail_cityname", null, 1);
+        assertNotNull("retirved product list shouldn't be null", retrivedProductsCondition3);
+        List<Product> retrivedProductsCondition4 = filterService.findProductByFilter(10010, "trail_cityname", 0, null);
+        assertNotNull("retirved product list shouldn't be null", retrivedProductsCondition4);
     }
 
     @Test
@@ -100,6 +110,14 @@ public class FilterServiceTest {
         assertThrows(CityNotExistException.class, ()->{
             filterService.findProductByFilter(10010, "LA", null, null);
         });
+
+        logger.info("Running findProductByAddress test for FilterService. Only has zipcode");
+        List<Product> condition1 = filterService.findProductByFilter(10010, "", null, null);
+        assertNotNull("retirved product list shouldn't be null", condition1);
+
+        logger.info("Running findProductByAddress test for FilterService. Only has city name");
+        List<Product> condition2 = filterService.findProductByFilter(null, "LA", null, null);
+        assertNotNull("retirved product list shouldn't be null", condition2);
     }
 
     @Test
@@ -139,5 +157,17 @@ public class FilterServiceTest {
             filterService.findProductByFilter(null, "", 2, 1);
         });
         assertEquals("Invalid Price Range. minPrice must be smaller than maxPrice.", exception.getMessage());
+
+        logger.info("Running findProductByPrice test for FilterService. No limit situation.");
+        List<Product> allProducts = filterService.findProductByFilter(null, "", null, null);
+        assertEquals(allProducts.size(), 1);
+
+        logger.info("Running findProductByPrice test for FilterService. Only lower boundary");
+        List<Product> condition1 = filterService.findProductByFilter(null, "", 0, null);
+        assertNotNull("retirved product list shouldn't be null", condition1);
+
+        logger.info("Running findProductByPrice test for FilterService. Only higher boundary");
+        List<Product> condition2 = filterService.findProductByFilter(null, "", null, 2);
+        assertNotNull("retirved product list shouldn't be null", condition2);
     }
 }
