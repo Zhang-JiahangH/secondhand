@@ -6,6 +6,8 @@ import com.secondhand.secondhand.model.Product;
 import com.secondhand.secondhand.model.User;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TestFactory {
     public static User getUser(String username) {
@@ -26,6 +28,21 @@ public class TestFactory {
         product.setCreatedAt(createdAt);
         product.setPrice(0);
         product.setDescription("nothing");
+        return product;
+    }
+
+    public static Product getProduct(User user, String productName, String description, int price, Genre genre, LocalDateTime createdAt) {
+        Product product = new Product();
+        product.setProductName(productName);
+        product.setCreatedAt(createdAt);
+        product.setUpdatedAt(createdAt);
+        product.setUser(user);
+        product.setDescription(description);
+        product.setPrice(price);
+        product.setGenre(genre);
+        Set<User> users = new HashSet<>();
+        users.add(user);
+        product.setFavoriteBy(users);
         return product;
     }
 

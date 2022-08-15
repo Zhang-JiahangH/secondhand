@@ -3,6 +3,7 @@ package com.secondhand.secondhand;
 import com.secondhand.secondhand.StubRepository.StubGenreRepository;
 import com.secondhand.secondhand.StubRepository.StubProductRepository;
 import com.secondhand.secondhand.StubRepository.StubUserRepository;
+import com.secondhand.secondhand.exception.InvalidProductInformationException;
 import com.secondhand.secondhand.exception.UserNotExistException;
 import com.secondhand.secondhand.model.Genre;
 import com.secondhand.secondhand.model.Product;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.parameters.P;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,10 +88,73 @@ public class ProductServiceTest {
         Genre genre = TestFactory.getGenre(genreType);
         genreRepository.save(genre);
 
+        LocalDateTime createdAt = LocalDateTime.now();
+
+        Product product = TestFactory.getProduct(user, productName, description, price, genre, createdAt);
+
         ProductService productService = new ProductService(productRepository, userRepository,productTypeRepository, genreRepository);
 
         productService.createAndAddProduct(username, productName, description, price, genreType);
 
-        assertEquals(productService.getProductByUsername(username).get(0).getProductName(), productName);
+        Product retrivedProduct = productService.getProductByUsername(username).get(0);
+        assertEquals(retrivedProduct.getProductName(), product.getProductName());
+        assertEquals(retrivedProduct.getDescription(), product.getDescription());
+        assertEquals(retrivedProduct.getPrice(), product.getPrice());
+        assertEquals(retrivedProduct.getGenre(), product.getGenre());
+        assertEquals(retrivedProduct.getFavoriteBy().size(), 0);
+    }
+
+    @Test
+    void createAndAddProductTestThrowUserNotExistException() {
+        logger.info("Running createAndAddProduct test for ProductService. Expect UserNotExistException");
+
+        String username = "trail_user";
+        String productName = "trial_product";
+        String description = "nothing";
+        int price = 1;
+        String genreType = "Clothes";
+
+        StubProductRepository productRepository = new StubProductRepository();
+        StubUserRepository userRepository = new StubUserRepository();
+        StubGenreRepository genreRepository = new StubGenreRepository();
+        ProductTypeRepository productTypeRepository = new ProductTypeRepository();
+
+        Genre genre = TestFactory.getGenre(genreType);
+        genreRepository.save(genre);
+
+        ProductService productService = new ProductService(productRepository, userRepository,productTypeRepository, genreRepository);
+
+        assertThrows(UserNotExistException.class, ()->{
+            productService.createAndAddProduct(username, productName, description, price, genreType);
+        });
+    }
+
+    @Test
+    void createAndAddProductTestThrowInvalidProductInformationException() {
+        logger.info("Running createAndAddProduct test for ProductService. Expect throw InvalidProductInformationException");
+        String username = "trail_user";
+        String productName = "trial_product";
+        String description = "nothing";
+        int price = -1;
+        String genreType = "Clothes";
+
+        StubProductRepository productRepository = new StubProductRepository();
+        StubUserRepository userRepository = new StubUserRepository();
+        StubGenreRepository genreRepository = new StubGenreRepository();
+        ProductTypeRepository productTypeRepository = new ProductTypeRepository();
+
+        User user = TestFactory.getUser(username);
+        userRepository.save(user);
+
+        Genre genre = TestFactory.getGenre(genreType);
+        genreRepository.save(genre);
+
+        ProductService productService = new ProductService(productRepository, userRepository,productTypeRepository, genreRepository);
+
+        InvalidProductInformationException exception = assertThrows(InvalidProductInformationException.class, ()->{
+            productService.createAndAddProduct(username, productName, description, price, genreType);
+        });
+
+        assertEquals("Invalid product information. Price <= 0 or Type invalid.", exception.getMessage());
     }
 }
