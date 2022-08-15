@@ -93,7 +93,7 @@ public class StubUserRepository implements UserRepository{
 
     @Override
     public void deleteAll() {
-        this.stubUserRepository = null;
+        this.stubUserRepository.clear();
     }
 
     @Override

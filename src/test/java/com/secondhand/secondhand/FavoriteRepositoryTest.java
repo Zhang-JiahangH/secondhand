@@ -4,13 +4,14 @@ import com.secondhand.secondhand.StubRepository.StubUserRepository;
 import com.secondhand.secondhand.model.Product;
 import com.secondhand.secondhand.model.User;
 import com.secondhand.secondhand.repository.FavoriteRepositoryImpl;
-import org.junit.jupiter.api.Test;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.jupiter.api.Test;
 import static org.junit.Assert.*;
 
 public class FavoriteRepositoryTest {
