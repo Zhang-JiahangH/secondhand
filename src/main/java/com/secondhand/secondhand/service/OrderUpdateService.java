@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 /**
  * Service to update order
@@ -45,7 +46,13 @@ public class OrderUpdateService {
         }
 
 
-        Order orderFromDB = orderRepository.findById(order.getId()).get();
+        Optional<Order> orderFromDBOptional = orderRepository.findById(order.getId());
+        if (orderFromDBOptional.isEmpty()) {
+            throw new OrderNotExistException("Order does not exist");
+        }
+
+        Order orderFromDB = orderFromDBOptional.get();
+
 
         User buyer = orderFromDB.getBuyer();
         User seller = orderFromDB.getSeller();

@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service to search order
@@ -60,7 +61,12 @@ public class OrderSearchService {
             throw new UserNotExistException("User Doesn't Exist");
         }
 
-        Order orderFromDB = orderRepository.findById(id).get();
+        Optional<Order> orderFromDBOptional = orderRepository.findById(id);
+        if (orderFromDBOptional.isEmpty()) {
+            throw new OrderNotExistException("Order does not exist");
+        }
+
+        Order orderFromDB = orderFromDBOptional.get();
 
         User buyer = orderFromDB.getBuyer();
         User seller = orderFromDB.getSeller();
