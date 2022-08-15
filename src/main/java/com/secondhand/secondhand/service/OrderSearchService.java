@@ -53,20 +53,16 @@ public class OrderSearchService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public Order searchOrderByOrderId(Long id, String username) throws OrderNotExistException, UserNotExistException, UserNotMatchException {
-        if (!orderRepository.existsById(id)) {
+        Optional<Order> orderFromDBOptional = orderRepository.findById(id);
+        if (orderFromDBOptional.isEmpty()) {
             throw new OrderNotExistException("Order Doesn't Exist");
         }
+
+        Order orderFromDB = orderFromDBOptional.get();
 
         if (!userRepository.existsById(username)) {
             throw new UserNotExistException("User Doesn't Exist");
         }
-
-        Optional<Order> orderFromDBOptional = orderRepository.findById(id);
-        if (orderFromDBOptional.isEmpty()) {
-            throw new OrderNotExistException("Order does not exist");
-        }
-
-        Order orderFromDB = orderFromDBOptional.get();
 
         User buyer = orderFromDB.getBuyer();
         User seller = orderFromDB.getSeller();
