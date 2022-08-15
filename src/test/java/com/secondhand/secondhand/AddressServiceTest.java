@@ -109,6 +109,10 @@ public class AddressServiceTest {
         addressService.createAndAddAddress("trial_user", line1, line2, line3, cityName, state, zipCode);
         List<Address> addresses = addressService.findAddressByCity(cityName);
         assertEquals(addresses.get(0).getCity(), createdCities.get(0).getCity());
+        assertEquals(addresses.get(0).getAddressLine1(), createdCities.get(0).getAddressLine1());
+        assertEquals(addresses.get(0).getAddressLine2(), createdCities.get(0).getAddressLine2());
+        assertEquals(addresses.get(0).getAddressLine3(), createdCities.get(0).getAddressLine3());
+        assertEquals(addresses.get(0).getState(), createdCities.get(0).getState());
     }
 
     @Test
