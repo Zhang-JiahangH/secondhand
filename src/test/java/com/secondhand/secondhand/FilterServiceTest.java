@@ -1,9 +1,143 @@
 package com.secondhand.secondhand;
 
+import com.secondhand.secondhand.StubRepository.StubAddressRepository;
+import com.secondhand.secondhand.StubRepository.StubProductRepository;
+import com.secondhand.secondhand.exception.CityNotExistException;
+import com.secondhand.secondhand.exception.InvalidPriceRangeException;
+import com.secondhand.secondhand.exception.ZipcodeNotExistException;
+import com.secondhand.secondhand.model.Address;
+import com.secondhand.secondhand.model.Genre;
+import com.secondhand.secondhand.model.Product;
+import com.secondhand.secondhand.model.User;
+import com.secondhand.secondhand.service.FilterService;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 public class FilterServiceTest {
     Logger logger = LoggerFactory.getLogger(FavoriteRepositoryTest.class);
 
+    @Test
+    void findProductByFilterTest() {
+        logger.info("Running findProductByFilter test for FilterService.");
+
+        StubAddressRepository addressRepository = new StubAddressRepository();
+        StubProductRepository productRepository = new StubProductRepository();
+
+        // creation variable
+        User user = TestFactory.getUser("trial_user");
+        String cityName = "trail_cityname";
+        int zipCode = 10010;
+        String line1 = "929 West Jefferson Blvd";
+        String line2 = "Cale and Irani";
+        String line3 = "5029D";
+        String state = "CA";
+        Address address = TestFactory.getAddress(user, line1, line2, line3, cityName, state, zipCode);
+        addressRepository.save(address);
+
+        String productName = "trial_product";
+        String description = "nothing";
+        int price = 1;
+        String genreType = "Clothes";
+        Genre genre = TestFactory.getGenre(genreType);
+        LocalDateTime createdAt = LocalDateTime.now();
+        Product product = TestFactory.getProduct(user, productName, description, price, genre, createdAt);
+        productRepository.save(product);
+
+        FilterService filterService = new FilterService(addressRepository, productRepository);
+
+        List<Product> retrivedProducts = filterService.findProductByFilter(10010, "trail_cityname", 0, 2);
+        assertNotNull("retirved product list shouldn't be null", retrivedProducts);
+        assertEquals(retrivedProducts.get(0).getProductName(), product.getProductName());
+    }
+
+    @Test
+    void findProductByAddressTest() {
+        logger.info("Running findProductByAddress test for FilterService.");
+
+        StubAddressRepository addressRepository = new StubAddressRepository();
+        StubProductRepository productRepository = new StubProductRepository();
+
+        // creation variable
+        User user = TestFactory.getUser("trial_user");
+        String cityName = "trail_cityname";
+        int zipCode = 10010;
+        String line1 = "929 West Jefferson Blvd";
+        String line2 = "Cale and Irani";
+        String line3 = "5029D";
+        String state = "CA";
+        Address address = TestFactory.getAddress(user, line1, line2, line3, cityName, state, zipCode);
+        addressRepository.save(address);
+
+        String productName = "trial_product";
+        String description = "nothing";
+        int price = 1;
+        String genreType = "Clothes";
+        Genre genre = TestFactory.getGenre(genreType);
+        LocalDateTime createdAt = LocalDateTime.now();
+        Product product = TestFactory.getProduct(user, productName, description, price, genre, createdAt);
+        productRepository.save(product);
+
+        FilterService filterService = new FilterService(addressRepository, productRepository);
+
+        List<Product> retrivedProducts = filterService.findProductByFilter(10010, "trail_cityname", null, null);
+        assertNotNull("retirved product list shouldn't be null", retrivedProducts);
+        assertEquals(retrivedProducts.get(0).getProductName(), product.getProductName());
+
+        logger.info("Running findProductByAddress test for FilterService. Expect ZipcodeNotExistException");
+        assertThrows(ZipcodeNotExistException.class, ()->{
+            filterService.findProductByFilter(10000, "trail_cityname", null, null);
+        });
+
+        logger.info("Running findProductByAddress test for FilterService. Expect CityNotExistException");
+        assertThrows(CityNotExistException.class, ()->{
+            filterService.findProductByFilter(10010, "LA", null, null);
+        });
+    }
+
+    @Test
+    void findProductByPriceTest() {
+        logger.info("Running findProductByPrice test for FilterService.");
+
+        StubAddressRepository addressRepository = new StubAddressRepository();
+        StubProductRepository productRepository = new StubProductRepository();
+
+        // creation variable
+        User user = TestFactory.getUser("trial_user");
+        String cityName = "trail_cityname";
+        int zipCode = 10010;
+        String line1 = "929 West Jefferson Blvd";
+        String line2 = "Cale and Irani";
+        String line3 = "5029D";
+        String state = "CA";
+        Address address = TestFactory.getAddress(user, line1, line2, line3, cityName, state, zipCode);
+        addressRepository.save(address);
+
+        String productName = "trial_product";
+        String description = "nothing";
+        int price = 1;
+        String genreType = "Clothes";
+        Genre genre = TestFactory.getGenre(genreType);
+        LocalDateTime createdAt = LocalDateTime.now();
+        Product product = TestFactory.getProduct(user, productName, description, price, genre, createdAt);
+        productRepository.save(product);
+
+        FilterService filterService = new FilterService(addressRepository, productRepository);
+        List<Product> retrivedProducts = filterService.findProductByFilter(null, "", 0, 1);
+        assertNotNull("retirved product list shouldn't be null", retrivedProducts);
+        assertEquals(retrivedProducts.get(0).getProductName(), product.getProductName());
+
+        logger.info("Running findProductByPrice test for FilterService. Expect InvalidPriceRangeException");
+        InvalidPriceRangeException exception = assertThrows(InvalidPriceRangeException.class, ()->{
+            filterService.findProductByFilter(null, "", 2, 1);
+        });
+        assertEquals("Invalid Price Range. minPrice must be smaller than maxPrice.", exception.getMessage());
+    }
 }
