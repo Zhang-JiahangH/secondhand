@@ -169,6 +169,11 @@ public class StubProductRepository implements ProductRepository {
 
     @Override
     public boolean existsById(Long aLong) {
+        for(var product:this.ProductRepository) {
+            if(product.getId() == aLong) {
+                return true;
+            }
+        }
         return false;
     }
 

@@ -3,10 +3,7 @@ package com.secondhand.secondhand;
 import com.secondhand.secondhand.StubRepository.StubOrderRepository;
 import com.secondhand.secondhand.StubRepository.StubProductRepository;
 import com.secondhand.secondhand.StubRepository.StubUserRepository;
-import com.secondhand.secondhand.exception.OrderNotExistException;
-import com.secondhand.secondhand.exception.OrderStatusNotExistException;
-import com.secondhand.secondhand.exception.UserNotExistException;
-import com.secondhand.secondhand.exception.UserNotMatchException;
+import com.secondhand.secondhand.exception.*;
 import com.secondhand.secondhand.model.Genre;
 import com.secondhand.secondhand.model.Order;
 import com.secondhand.secondhand.model.Product;
@@ -53,6 +50,8 @@ public class OrderServiceTest {
         LocalDateTime createdAt = LocalDateTime.now();
         Product product = TestFactory.getProduct(user2, productName, description, price, genre, createdAt);
         product.setId(0L);
+        Product invalidProduct = TestFactory.getProduct(user2, productName, description, price, genre, createdAt);
+        product.setId(5L);
         productRepository.save(product);
 
         OrderCreateService orderCreateService = new OrderCreateService(userRepository, orderRepository, productRepository);
@@ -70,6 +69,16 @@ public class OrderServiceTest {
         assertThrows(UserNotExistException.class, ()->{
             orderCreateService.add(username1, "null", product.getId());
         });
+
+        ProductNotExistException productNotExistException = assertThrows(ProductNotExistException.class, ()->{
+            orderCreateService.add(username1, username2, invalidProduct.getId());
+        });
+        assertEquals("Product Doesn't Exist", productNotExistException.getMessage());
+
+        Exception e = assertThrows(UserNotExistException.class, ()->{
+            orderCreateService.add(username2, username1, product.getId());
+        });
+        assertEquals("This Product Doesn't Belong to This Seller", e.getMessage());
 
         OrderSearchService orderSearchService = new OrderSearchService(userRepository, orderRepository);
         logger.info("Running searchOrderByBuyer test for OrderSearchService.");
