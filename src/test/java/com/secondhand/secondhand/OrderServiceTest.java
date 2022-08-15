@@ -2,18 +2,24 @@ package com.secondhand.secondhand;
 
 import com.secondhand.secondhand.StubRepository.StubOrderRepository;
 import com.secondhand.secondhand.StubRepository.StubUserRepository;
+import com.secondhand.secondhand.exception.OrderNotExistException;
+import com.secondhand.secondhand.exception.OrderStatusNotExistException;
 import com.secondhand.secondhand.exception.UserNotExistException;
+import com.secondhand.secondhand.exception.UserNotMatchException;
 import com.secondhand.secondhand.model.Genre;
 import com.secondhand.secondhand.model.Order;
 import com.secondhand.secondhand.model.Product;
 import com.secondhand.secondhand.model.User;
 import com.secondhand.secondhand.service.OrderCreateService;
 import com.secondhand.secondhand.service.OrderSearchService;
+import com.secondhand.secondhand.service.OrderUpdateService;
+import org.aspectj.weaver.ast.Or;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.junit.jupiter.api.Test;
 
+import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -97,7 +103,65 @@ public class OrderServiceTest {
         Order order = TestFactory.getOrder(product.getId(), user1, user2, id);
         orderRepository.save(order);
 
+        logger.info("Running searchOrderByOrderId test for OrderSearchService.");
         Order retrivedOrder = orderSearchService.searchOrderByOrderId(id, username1);
         assertNotNull("order should not be a null", retrivedOrder);
+
+        logger.info("Running searchOrderByOrderId test for OrderSearchService. Invalid order. Expect OrderNotExistException");
+        OrderNotExistException expection = assertThrows(OrderNotExistException.class, ()->{
+            orderSearchService.searchOrderByOrderId(1L, username1);
+        });
+        assertEquals("Order Doesn't Exist", expection.getMessage());
+
+        logger.info("Running searchOrderByOrderId test for OrderSearchService. Invalid user. Expect UserNotExistException");
+        assertThrows(UserNotExistException.class, ()->{
+            orderSearchService.searchOrderByOrderId(id, "null");
+        });
+
+        Order newOrder = new Order();
+        newOrder.setId(1L);
+        orderRepository.save(newOrder);
+
+        logger.info("Running searchOrderByOrderId test for OrderSearchService. Invalid Order. Expect UserNotMatchException");
+        UserNotMatchException userException = assertThrows(UserNotMatchException.class, ()->{
+            orderSearchService.searchOrderByOrderId(1L, username1);
+        });
+        assertEquals("Current user is not owner of this order", userException.getMessage());
+
+        logger.info("Running searchOrderByOrderId test for OrderSearchService. Invalid User. Expect UserNotMatchException");
+        User nonExistUser = TestFactory.getUser("wow");
+        userRepository.save(nonExistUser);
+        assertThrows(UserNotMatchException.class, ()->{
+            orderSearchService.searchOrderByOrderId(id, "wow");
+        });
+
+        logger.info("Running update for OrderUpdateService.");
+        OrderUpdateService orderUpdateService = new OrderUpdateService(userRepository, orderRepository);
+        order.setOrderStatus("deleted");
+        orderUpdateService.update(order, username1);
+        assertEquals("deleted", orderSearchService.searchOrderByOrderId(id, username1).getOrderStatus());
+
+        logger.info("Running update for OrderUpdateService. Invalid Order. Expect OrderStatusNotExistException");
+        newOrder.setOrderStatus("ordered");
+        OrderStatusNotExistException orderStatusNotExistException = assertThrows(OrderStatusNotExistException.class, ()->{
+            orderUpdateService.update(newOrder, username1);
+        });
+        assertEquals("Order Status Doesn't Exist", orderStatusNotExistException.getMessage());
+
+        logger.info("Running update for OrderUpdateService. Invalid Order. Expect OrderNotExistException");
+        Order invalidOrder = TestFactory.getOrder(2L, user1, user2, 9L);
+        assertThrows(OrderNotExistException.class, ()->{
+            orderUpdateService.update(invalidOrder, username1);
+        });
+
+        newOrder.setOrderStatus("deleted");
+        assertThrows(UserNotMatchException.class, ()->{
+            orderUpdateService.update(newOrder, username1);
+        });
+
+        order.setOrderStatus("paid");
+        assertThrows(UserNotMatchException.class, ()->{
+            orderUpdateService.update(order, "null");
+        });
     }
 }

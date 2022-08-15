@@ -53,7 +53,6 @@ public class OrderUpdateService {
 
         Order orderFromDB = orderFromDBOptional.get();
 
-
         User buyer = orderFromDB.getBuyer();
         User seller = orderFromDB.getSeller();
         String buyerUsername = null;
