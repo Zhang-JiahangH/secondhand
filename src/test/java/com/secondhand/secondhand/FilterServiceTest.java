@@ -170,4 +170,41 @@ public class FilterServiceTest {
         List<Product> condition2 = filterService.findProductByFilter(null, "", null, 2);
         assertNotNull("retirved product list shouldn't be null", condition2);
     }
+
+    @Test
+    void multipleProductsTest() {
+        logger.info("Running multiple products test for FilterService.");
+
+        StubAddressRepository addressRepository = new StubAddressRepository();
+        StubProductRepository productRepository = new StubProductRepository();
+
+        // creation variable
+        User user = TestFactory.getUser("trial_user");
+        String cityName = "trail_cityname";
+        int zipCode = 10010;
+        String line1 = "929 West Jefferson Blvd";
+        String line2 = "Cale and Irani";
+        String line3 = "5029D";
+        String state = "CA";
+        Address address = TestFactory.getAddress(user, line1, line2, line3, cityName, state, zipCode);
+        addressRepository.save(address);
+
+        String productName = "trial_product";
+        String description = "nothing";
+        int price = 2;
+        String genreType = "Clothes";
+        Genre genre = TestFactory.getGenre(genreType);
+        LocalDateTime createdAt = LocalDateTime.now();
+        Product product = TestFactory.getProduct(user, productName, description, price, genre, createdAt);
+        Product product1 = TestFactory.getProduct(user, productName, description, 1, genre, createdAt);
+        Product product2 = TestFactory.getProduct(user, productName, description, 5, genre, createdAt);
+        productRepository.save(product);
+        productRepository.save(product1);
+        productRepository.save(product2);
+
+        FilterService filterService = new FilterService(addressRepository, productRepository);
+        List<Product> retrivedProducts = filterService.findProductByFilter(10010, "trail_cityname", 2, 3);
+
+        assertEquals(1, retrivedProducts.size());
+    }
 }

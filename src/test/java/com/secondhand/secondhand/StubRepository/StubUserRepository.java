@@ -61,7 +61,16 @@ public class StubUserRepository implements UserRepository{
 
     @Override
     public List<User> findAllById(Iterable<String> strings) {
-        return null;
+        List<User> users = new ArrayList<>();
+        for(var name:strings) {
+            for(var user:this.stubUserRepository) {
+                if(user.getUsername() == name) {
+                    users.add(user);
+                    break;
+                }
+            }
+        }
+        return users;
     }
 
     @Override
@@ -71,7 +80,12 @@ public class StubUserRepository implements UserRepository{
 
     @Override
     public void deleteById(String s) {
-
+        for(var user:this.stubUserRepository) {
+            if(user.getUsername() == s) {
+                this.stubUserRepository.remove(user);
+                break;
+            }
+        }
     }
 
     @Override
@@ -81,7 +95,10 @@ public class StubUserRepository implements UserRepository{
 
     @Override
     public void deleteAllById(Iterable<? extends String> strings) {
-
+        List<User> deletedUser = this.findAllById((Iterable<String>) strings);
+        for(var user:deletedUser) {
+            this.stubUserRepository.remove(user);
+        }
     }
 
     @Override
@@ -112,12 +129,17 @@ public class StubUserRepository implements UserRepository{
 
     @Override
     public Optional<User> findById(String s) {
+        for(var user:stubUserRepository) {
+            if(user.getUsername() == s) {
+                return Optional.of(user);
+            }
+        }
         return Optional.empty();
     }
 
     @Override
     public boolean existsById(String s) {
-        return false;
+        return !this.findById(s).isEmpty();
     }
 
     @Override

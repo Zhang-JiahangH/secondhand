@@ -46,6 +46,7 @@ public class OrderCreateService {
         Order order = new Order.Builder()
                 .setProductId(productId)
                 .setCreatedAt(LocalDateTime.now())
+                .setUpdatedAt(LocalDateTime.now())
                 .setOrderStatus("ordered")
                 .build();
         order.setBuyer(buyer);
