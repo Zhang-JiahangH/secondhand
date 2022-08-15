@@ -31,9 +31,12 @@ public class OrderUpdateService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void update(Order order, String username) throws OrderNotExistException, OrderStatusNotExistException, UserNotMatchException {
-        if (!orderRepository.existsById(order.getId())) {
+        Optional<Order> orderFromDBOptional = orderRepository.findById(order.getId());
+        if (orderFromDBOptional.isEmpty()) {
             throw new OrderNotExistException("Order Doesn't Exist");
         }
+
+        Order orderFromDB = orderFromDBOptional.get();
 
         String orderStatus = order.getOrderStatus();
         if (!orderStatus.equals("paid")
@@ -44,14 +47,6 @@ public class OrderUpdateService {
                 && !orderStatus.equals("deleted")) {
             throw new OrderStatusNotExistException("Order Status Doesn't Exist");
         }
-
-
-        Optional<Order> orderFromDBOptional = orderRepository.findById(order.getId());
-        if (orderFromDBOptional.isEmpty()) {
-            throw new OrderNotExistException("Order does not exist");
-        }
-
-        Order orderFromDB = orderFromDBOptional.get();
 
         User buyer = orderFromDB.getBuyer();
         User seller = orderFromDB.getSeller();
