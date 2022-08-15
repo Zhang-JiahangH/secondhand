@@ -1,6 +1,7 @@
 package com.secondhand.secondhand;
 
 import com.secondhand.secondhand.StubRepository.StubOrderRepository;
+import com.secondhand.secondhand.StubRepository.StubProductRepository;
 import com.secondhand.secondhand.StubRepository.StubUserRepository;
 import com.secondhand.secondhand.exception.OrderNotExistException;
 import com.secondhand.secondhand.exception.OrderStatusNotExistException;
@@ -35,6 +36,7 @@ public class OrderServiceTest {
         logger.info("Running add test for OrderCreateService");
         StubUserRepository userRepository = new StubUserRepository();
         StubOrderRepository orderRepository = new StubOrderRepository();
+        StubProductRepository productRepository = new StubProductRepository();
 
         String username1 = "trail_buyer";
         User user1 = TestFactory.getUser(username1);
@@ -51,8 +53,9 @@ public class OrderServiceTest {
         LocalDateTime createdAt = LocalDateTime.now();
         Product product = TestFactory.getProduct(user2, productName, description, price, genre, createdAt);
         product.setId(0L);
+        productRepository.save(product);
 
-        OrderCreateService orderCreateService = new OrderCreateService(userRepository, orderRepository);
+        OrderCreateService orderCreateService = new OrderCreateService(userRepository, orderRepository, productRepository);
 
         assertEquals(0, orderRepository.count());
         orderCreateService.add(username1, username2, product.getId());

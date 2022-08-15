@@ -159,6 +159,11 @@ public class StubProductRepository implements ProductRepository {
 
     @Override
     public Optional<Product> findById(Long aLong) {
+        for(Product product:this.ProductRepository) {
+            if(product.getId() == aLong) {
+                return Optional.of(product);
+            }
+        }
         return Optional.empty();
     }
 
