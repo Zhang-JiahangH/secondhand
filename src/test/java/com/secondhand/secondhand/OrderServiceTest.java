@@ -72,5 +72,32 @@ public class OrderServiceTest {
         assertEquals("ordered", ordersByBuyer.get(0).getOrderStatus());
         assertNotNull("has created time", ordersByBuyer.get(0).getCreatedAt());
         assertNotNull("has updated time", ordersByBuyer.get(0).getUpdatedAt());
+
+        logger.info("Running searchOrderByBuyer test for OrderSearchService. Non-exist Buyer. Expect UserNotExistException");
+        assertThrows(UserNotExistException.class, ()->{
+            orderSearchService.searchOrderByBuyer("null");
+        });
+
+        logger.info("Running searchOrderBySeller test for OrderSearchService.");
+        List<Order> ordersBySeller= orderSearchService.searchOrderBySeller(username2);
+        assertNotNull("retrived list should not be null", ordersBySeller);
+        assertEquals(product.getId(), ordersBySeller.get(0).getProductId());
+        assertEquals(user1, ordersBySeller.get(0).getBuyer());
+        assertEquals(user2, ordersBySeller.get(0).getSeller());
+        assertEquals("ordered", ordersBySeller.get(0).getOrderStatus());
+        assertNotNull("has created time", ordersBySeller.get(0).getCreatedAt());
+        assertNotNull("has updated time", ordersBySeller.get(0).getUpdatedAt());
+
+        logger.info("Running searchOrderBySeller test for OrderSearchService. Non-exist Seller. Expect UserNotExistException");
+        assertThrows(UserNotExistException.class, ()->{
+            orderSearchService.searchOrderBySeller("null");
+        });
+
+        Long id = 0L;
+        Order order = TestFactory.getOrder(product.getId(), user1, user2, id);
+        orderRepository.save(order);
+
+        Order retrivedOrder = orderSearchService.searchOrderByOrderId(id, username1);
+        assertNotNull("order should not be a null", retrivedOrder);
     }
 }

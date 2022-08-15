@@ -1,9 +1,6 @@
 package com.secondhand.secondhand;
 
-import com.secondhand.secondhand.model.Address;
-import com.secondhand.secondhand.model.Genre;
-import com.secondhand.secondhand.model.Product;
-import com.secondhand.secondhand.model.User;
+import com.secondhand.secondhand.model.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -70,5 +67,17 @@ public class TestFactory {
         Genre genre = new Genre();
         genre.setGenreType(genreType);
         return genre;
+    }
+
+    public static Order getOrder(Long productId, User buyer, User seller, Long id) {
+        Order order = new Order.Builder().setProductId(productId)
+                .setCreatedAt(LocalDateTime.now())
+                .setUpdatedAt(LocalDateTime.now())
+                .setOrderStatus("ordered")
+                .setId(id)
+                .build();
+        order.setBuyer(buyer);
+        order.setSeller(seller);
+        return order;
     }
 }

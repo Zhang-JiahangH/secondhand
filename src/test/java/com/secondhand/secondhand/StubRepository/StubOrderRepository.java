@@ -110,12 +110,20 @@ public class StubOrderRepository implements OrderRepository {
 
     @Override
     public Optional<Order> findById(Long aLong) {
+        for(var order:OrderRepository) {
+            if(order.getId() == null) {
+                continue;
+            }
+            if(order.getId() == aLong) {
+                return Optional.of(order);
+            }
+        }
         return Optional.empty();
     }
 
     @Override
     public boolean existsById(Long aLong) {
-        return false;
+        return !this.findById(aLong).isEmpty();
     }
 
     @Override
