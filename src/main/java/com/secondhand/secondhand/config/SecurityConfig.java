@@ -72,6 +72,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST,"/favorite").hasAuthority("ROLE_USER")
                 .antMatchers(HttpMethod.GET,"/favorite").hasAuthority("ROLE_USER")
 
+                .antMatchers("/user/getinfo").hasAuthority("ROLE_USER")
                 .antMatchers("/user/update").hasAuthority("ROLE_USER")
                 .antMatchers("/user/delete").hasAuthority("ROLE_USER")
                 .antMatchers("/order/create").hasAuthority("ROLE_USER")
