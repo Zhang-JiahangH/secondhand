@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
+
 /**
  * Controller for user search
  */
@@ -22,5 +24,10 @@ public class UserSearchController {
     @GetMapping(value = "/user/search/{username}")
     public User searchUser(@PathVariable String username) {
         return userSearchService.search(username);
+    }
+
+    @GetMapping(value = "/user/getinfo")
+    public User getInfo(Principal principal) {
+        return userSearchService.search(principal.getName());
     }
 }
