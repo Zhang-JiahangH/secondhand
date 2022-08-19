@@ -27,8 +27,9 @@ public class ProductController {
                            @RequestParam(name = "product_name") String productName,
                            @RequestParam(name = "description") String description,
                            @RequestParam(name = "price") int price,
+                           @RequestParam(name = "images") List<String> urlList,
                            @RequestParam(name = "genre_type") String genreType) {
-        productService.createAndAddProduct(principal.getName(), productName, description, price, genreType);
+        productService.createAndAddProduct(principal.getName(), productName, description, price, urlList, genreType);
     }
 
     @GetMapping("/products")
