@@ -2,7 +2,9 @@ package com.secondhand.secondhand.service;
 
 import com.secondhand.secondhand.exception.GenreTypeExistException;
 import com.secondhand.secondhand.exception.InvalidProductInformationException;
+import com.secondhand.secondhand.exception.OrderNotExistException;
 import com.secondhand.secondhand.model.Genre;
+import com.secondhand.secondhand.model.Order;
 import com.secondhand.secondhand.model.Product;
 import com.secondhand.secondhand.repository.GenreRepository;
 import com.secondhand.secondhand.repository.ProductRepository;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GenreService {
@@ -31,10 +34,12 @@ public class GenreService {
     }
 
     public List<Product> getProductByGenre(String genreType) throws GenreTypeExistException {
-        if (!genreRepository.existsByGenreType(genreType)) {
+        Optional<Genre> genreFromDBOptional = genreRepository.findById(genreType);
+        if (genreFromDBOptional.isEmpty()) {
             throw new GenreTypeExistException("Invalid Product Type Entered. Clothes, Shoe, ElectricDevice, Furniture");
         }
-        Genre genre = genreRepository.findById(genreType).get();
+
+        Genre genre = genreFromDBOptional.get();
         return productRepository.findByGenre(genre);
     }
 

@@ -36,8 +36,9 @@ public class Product implements Serializable {
     @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
 
-//    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch=FetchType.EAGER)
-//    private List<ProductImage> imagesList = new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch=FetchType.EAGER)
+    @JsonProperty("images")
+    private Set<ProductImage> imagesList = new HashSet<>();
 
     @ManyToOne(cascade = CascadeType.ALL, fetch=FetchType.EAGER)
     @JoinColumn(name = "username")
@@ -66,7 +67,7 @@ public class Product implements Serializable {
         this.price = builder.price;
         this.createdAt = builder.createdAt;
         this.updatedAt = builder.updatedAt;
-        //this.imagesList = builder.imagesList;
+        this.imagesList = builder.imagesList;
         this.user = builder.user;
         this.genre = builder.genre;
     }
@@ -122,13 +123,13 @@ public class Product implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-//    public List<ProductImage> getImagesList() {
-//        return imagesList;
-//    }
-//
-//    public void setImagesList(List<ProductImage> imagesList) {
-//        this.imagesList = imagesList;
-//    }
+    public Set<ProductImage> getImagesList() {
+        return imagesList;
+    }
+
+    public void setImagesList(Set<ProductImage> imagesList) {
+        this.imagesList = imagesList;
+    }
 
     public User getUser() {
         return user;
@@ -177,8 +178,8 @@ public class Product implements Serializable {
         @JsonProperty("updated_at")
         private LocalDateTime updatedAt;
 
-//        @JsonProperty("images_list")
-//        private List<ProductImage> imagesList;
+        @JsonProperty("images_list")
+        private Set<ProductImage> imagesList;
 
         @JsonProperty("username")
         private User user;
@@ -216,10 +217,10 @@ public class Product implements Serializable {
             return this;
         }
 
-//        public Builder setImagesList(List<ProductImage> imagesList) {
-//            this.imagesList = imagesList;
-//            return this;
-//        }
+        public Builder setImagesList(Set<ProductImage> imagesList) {
+            this.imagesList = imagesList;
+            return this;
+        }
 
         public Builder setUser(User user) {
             this.user = user;

@@ -65,6 +65,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // Product Get my products
                 .antMatchers(HttpMethod.GET,"/products").hasAuthority("ROLE_USER")
 
+                // Product Search by name
+                .antMatchers(HttpMethod.GET, "/products/search/*").permitAll()
+
                 // Product Search By Filter
                 .antMatchers(HttpMethod.GET,"/filters").permitAll()
 
